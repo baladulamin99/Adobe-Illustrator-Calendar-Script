@@ -333,11 +333,12 @@ function drawMonth(ctx, o, box, y, m, mini) {
       var bs = Math.min(cw * 0.24, ch * 0.25);
       var label, lsz;
       var bdig = o.bnDateDigits;           // true = Bengali digits, false = English digits
-      if (b.day === 1) { label = numStr(1, bdig) + " " + BN_MONTHS[b.month]; lsz = bs * 0.9; }
+      var first = (b.day === 1 && o.bnMonthStart);   // month-name label on the 1st (optional)
+      if (first) { label = numStr(1, bdig) + " " + BN_MONTHS[b.month]; lsz = bs * 0.9; }
       else { label = numStr(b.day, bdig); lsz = bs; }
       drawText(ctx, label, cx + cw - cw * 0.07, cy + ch - ch * 0.10, lsz,
-        C.accent, "r", (!bdig && b.day !== 1) ? ctx.fLat : ctx.fBn, cw * 0.88,
-        (!bdig && b.day === 1) ? ctx.fLat : null);
+        C.accent, "r", (!bdig && !first) ? ctx.fLat : ctx.fBn, cw * 0.88,
+        (!bdig && first) ? ctx.fLat : null);
     }
 
     // Holiday label (only on large cells)
@@ -414,6 +415,7 @@ function showDialog() {
   var dBnDig = addDrop(p2, "Bengali date digits",
     ["English digits (1, 2, 3) in English font", "Bengali digits in Bengali font"], 0);
   var cBn = p2.add("checkbox", undefined, "Add Bengali year, month and date"); cBn.value = true;
+  var cMs = p2.add("checkbox", undefined, "Show Bengali month name on the 1st day (e.g. 1 Boishakh)"); cMs.value = false;
   var cFri = p2.add("checkbox", undefined, "Show Friday in red (weekend)"); cFri.value = true;
   var cSat = p2.add("checkbox", undefined, "Show Saturday in red (weekend)"); cSat.value = false;
   var cNat = p2.add("checkbox", undefined, "Show fixed national days in red"); cNat.value = true;
@@ -483,6 +485,7 @@ function showDialog() {
       theme: dTheme.selection.index,
       rgb: (dMode.selection.index === 1),
       showBn: cBn.value,
+      bnMonthStart: cMs.value,
       friRed: cFri.value,
       satRed: cSat.value,
       national: cNat.value,
